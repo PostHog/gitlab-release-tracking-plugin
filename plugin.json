@@ -1,0 +1,50 @@
+{
+    "name": "gitlab-release-tracking-plugin",
+    "url": "https://github.com/PostHog/gitlab-release-tracking-plugin",
+    "description": "Track GitLab releases in PostHog.",
+    "main": "index.js",
+    "config": {
+        "posthogHost": {
+            "hint": "Optional - defaults to https://app.posthog.com",
+            "name": "URL of your PostHog instance",
+            "type": "string",
+            "order": 1,
+            "default": "https://app.posthog.com",
+            "required": false
+        },
+        "posthogApiKey": {
+            "hint": "Your Personal API Key is not the same as the Project API key",
+            "name": "PostHog API Key",
+            "type": "string",
+            "order": 2,
+            "default": "",
+            "required": true
+        },
+        "gitlabHost": {
+            "hint": "Optional - defaults to https://gitlab.com",
+            "name": "URL of your GitLab instance",
+            "type": "string",
+            "order": 3,
+            "default": "https://gitlab.com",
+            "required": false
+        },
+        "gitlabProjectId": {
+            "hint": "",
+            "name": "Unique ID of your GitLab Project",
+            "type": "string",
+            "order": 4,
+            "default": "",
+            "required": true
+        },
+        "gitlabToken": {
+            "hint": "Required for private repos only",
+            "name": "GitLab Personal Token",
+            "type": "string",
+            "order": 5,
+            "default": "",
+            "required": false
+        }
+    }
+}
+
+
