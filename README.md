@@ -1,4 +1,4 @@
-# PostHog Release Tracking Plugin
+# GitLab Release Tracking Plugin
 
 Integrate PostHog with GitLab and get automatic graph annotations based on your repository's tags so you can analyze the impact of new releases on your key metrics. 
 
