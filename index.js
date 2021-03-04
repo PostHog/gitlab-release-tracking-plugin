@@ -39,14 +39,26 @@ async function setupPlugin({ config, global }) {
     }
 }
 
-async function runEveryDay({ config, global }) {
-    const annotationsResponse = await fetchWithRetry(
-        `${global.posthogHost}/api/annotation/?scope=organization&deleted=false`,
-        global.posthogOptions
-    )
 
-    const annotationsJson = await annotationsResponse.json()
-    let annotations = new Set(annotationsJson.results.map((annotation) => annotation.content))
+async function runEveryMinute({ config, global, cache }) {
+    const lastRun = await cache.get('lastRun')
+    if (
+        lastRun &&
+        new Date().getTime() - Number(lastRun) < 3600000 // 60*60*1000ms = 1 hour
+    ) {
+        return
+    }
+    let allPostHogAnnotations = []
+    let next = `${global.posthogHost}/api/annotation/?scope=organization&deleted=false`
+    while (next) {
+        const annotationsResponse = await fetchWithRetry(next, global.posthogOptions)
+        const annotationsJson = await annotationsResponse.json()
+        const annotationNames = annotationsJson.results.map((annotation) => annotation.content)
+        next = annotationsJson.next
+        allPostHogAnnotations = [...allPostHogAnnotations, ...annotationNames]
+    }
+
+    let annotations = new Set(allPostHogAnnotations)
 
     const gitlabTagsResponse = await fetchWithRetry(`${global.gitlabApiBaseUrl}/repository/tags`, global.gitlabOptions)
 
