@@ -13,15 +13,6 @@
             "required": false
         },
         {
-            "key": "posthogApiKey",
-            "hint": "Your Personal API Key is not the same as the Project API key",
-            "name": "PostHog API Key",
-            "type": "string",
-            "default": "",
-            "required": true,
-            "secret": true
-        },
-        {
             "key": "gitlabHost",
             "hint": "Optional - defaults to https://gitlab.com",
             "name": "URL of your GitLab instance",

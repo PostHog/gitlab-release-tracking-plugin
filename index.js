@@ -9,12 +9,6 @@ async function setupPlugin({ config, global }) {
         (config.gitlabHost.includes('http') ? config.gitlabHost : 'https://' + config.gitlabHost) +
         `/api/v4/projects/${config.gitlabProjectId}`
 
-    global.posthogOptions = {
-        headers: {
-            Authorization: `Bearer ${config.posthogApiKey}`,
-        },
-    }
-
     global.gitlabOptions = config.gitlabToken
         ? {
               headers: {
@@ -73,21 +67,13 @@ async function runEveryMinute({ config, global, cache }) {
         .filter((tag) => !annotations.has(tag.name))
 
     for (let tag of newTags) {
-        const createAnnotationRes = await fetchWithRetry(
-            `${global.posthogHost}/api/annotation/`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${config.posthogApiKey}`,
-                },
-                body: JSON.stringify({
-                    content: tag.name,
-                    scope: 'organization',
-                    date_marker: tag.date,
-                }),
-            },
-            'POST'
-        )
+        const tagData = {
+            content: tag.name,
+            scope: 'organization',
+            date_marker: tag.date,
+        }
+        
+        const createAnnotationRes = posthog.api.post('/api/annotation/', { host: global.posthogHost, data: tagData })
 
         if (createAnnotationRes.status === 201) {
             posthog.capture('created_tag_annotation', { tag: tag.name })
