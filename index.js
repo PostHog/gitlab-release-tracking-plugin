@@ -18,7 +18,7 @@ async function setupPlugin({ config, global }) {
         : {}
 
     try {
-        const posthogRes = await fetchWithRetry(`${global.posthogHost}/api/user`, global.posthogOptions)
+        const posthogRes = await fetchWithRetry(`${global.posthogHost}/api/users/@me`, global.posthogOptions)
 
         const gitlabRes = await fetchWithRetry(global.gitlabApiBaseUrl, global.gitlabOptions)
 
