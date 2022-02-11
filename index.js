@@ -18,8 +18,9 @@ async function setupPlugin({ config, global }) {
         : {}
 
     try {
-        const posthogRes = await fetchWithRetry(`${global.posthogHost}/api/users/@me`, global.posthogOptions)
-
+        const posthogRes = await posthog.api.get(`/api/users/@me`, {
+            host: global.posthogHost
+        })
         const gitlabRes = await fetchWithRetry(global.gitlabApiBaseUrl, global.gitlabOptions)
 
         if (posthogRes.status !== 200) {
