@@ -41,7 +41,6 @@ async function runEveryMinute({ config, global, cache }) {
         next = annotationsJson.next?.replace(global.posthogHost, '')
         allPostHogAnnotations = [...allPostHogAnnotations, ...annotationNames]
     }
-    console.log("annotations:", allPostHogAnnotations.length)
 
     let annotations = new Set(allPostHogAnnotations)
 
@@ -65,7 +64,7 @@ async function runEveryMinute({ config, global, cache }) {
         }
         
         const createAnnotationRes = posthog.api.post('/api/annotation/', { host: global.posthogHost, data: tagData })
-        console.log('added annotation')
+        console.log(`added annotation: ${tag.name}`)
         if (createAnnotationRes.status === 201) {
             posthog.capture('created_tag_annotation', { tag: tag.name })
         }
