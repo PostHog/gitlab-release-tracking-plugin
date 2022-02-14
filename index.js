@@ -17,14 +17,10 @@ async function setupPlugin({ config, global }) {
           }
         : {}
 
-    try {
-        const gitlabRes = await fetchWithRetry(global.gitlabApiBaseUrl, global.gitlabOptions)
+    const gitlabRes = await fetchWithRetry(global.gitlabApiBaseUrl, global.gitlabOptions)
 
-        if (gitlabRes.status !== 200) {
-            throw new Error('Invalid GitLab project ID, host, or token')
-        }
-    } catch {
-        throw new Error('Invalid PostHog Personal API key')
+    if (gitlabRes.status !== 200) {
+        throw new Error('Invalid GitLab project ID, host, or token')
     }
 }
 
