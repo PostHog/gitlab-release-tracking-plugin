@@ -20,7 +20,12 @@ async function setupPlugin({ config, global }) {
     const gitlabRes = await fetchWithRetry(global.gitlabApiBaseUrl, global.gitlabOptions)
 
     if (gitlabRes.status !== 200) {
-        throw new Error('Invalid GitLab project ID, host, or token')
+        let resp = null;
+        try {
+            resp = await gitlabRes.text()
+        } catch () {}
+       
+        throw new Error(`Gitlab returned ${gitlabRes.status} - ${resp}`)
     }
 }
 
