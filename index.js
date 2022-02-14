@@ -38,7 +38,7 @@ async function runEveryMinute({ config, global, cache }) {
         })
         const annotationsJson = await annotationsResponse.json()
         const annotationNames = annotationsJson.results.map((annotation) => annotation.content)
-        next = annotationsJson.next.replace(global.posthogHost, '')
+        next = annotationsJson.next?.replace(global.posthogHost, '')
         allPostHogAnnotations = [...allPostHogAnnotations, ...annotationNames]
     }
     console.log("annotations:", allPostHogAnnotations.length)
