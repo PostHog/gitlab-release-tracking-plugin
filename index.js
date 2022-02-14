@@ -23,7 +23,7 @@ async function setupPlugin({ config, global }) {
         let resp = null;
         try {
             resp = await gitlabRes.text()
-        } catch () {}
+        } catch {}
        
         throw new Error(`Gitlab returned ${gitlabRes.status} - ${resp}`)
     }
