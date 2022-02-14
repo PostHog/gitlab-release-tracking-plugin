@@ -1,7 +1,7 @@
 async function setupPlugin({ config, global }) {
     // Remove trailing slashes
-    config.posthogHost = config.posthogHost.replace(/\/$/, '')
-    config.gitlabHost = config.gitlabHost.replace(/\/$/, '')
+
+    config.gitlabHost = (config.gitlabHost || 'https://gitlab.com').replace(/\/$/, '')
 
     global.posthogHost = config.posthogHost.includes('http') ? config.posthogHost : 'https://' + config.posthogHost
 
@@ -18,13 +18,8 @@ async function setupPlugin({ config, global }) {
         : {}
 
     try {
-        const posthogRes = await fetchWithRetry(`${global.posthogHost}/api/users/@me`, global.posthogOptions)
-
         const gitlabRes = await fetchWithRetry(global.gitlabApiBaseUrl, global.gitlabOptions)
 
-        if (posthogRes.status !== 200) {
-            throw new Error('Invalid PostHog Personal API key')
-        }
         if (gitlabRes.status !== 200) {
             throw new Error('Invalid GitLab project ID, host, or token')
         }
@@ -35,20 +30,15 @@ async function setupPlugin({ config, global }) {
 
 
 async function runEveryMinute({ config, global, cache }) {
-    const lastRun = await cache.get('lastRun')
-    if (
-        lastRun &&
-        new Date().getTime() - Number(lastRun) < 3600000 // 60*60*1000ms = 1 hour
-    ) {
-        return
-    }
     let allPostHogAnnotations = []
-    let next = `${global.posthogHost}/api/annotation/?scope=organization&deleted=false`
+    let next = true          
     while (next) {
-        const annotationsResponse = await fetchWithRetry(next, global.posthogOptions)
+        const annotationsResponse = await posthog.api.get(next === true ? '/api/annotation/?scope=organization&deleted=false' : next, {
+            host: global.posthogHost
+        })
         const annotationsJson = await annotationsResponse.json()
         const annotationNames = annotationsJson.results.map((annotation) => annotation.content)
-        next = annotationsJson.next
+        next = annotationsJson.next?.replace(global.posthogHost, '')
         allPostHogAnnotations = [...allPostHogAnnotations, ...annotationNames]
     }
 
@@ -74,7 +64,7 @@ async function runEveryMinute({ config, global, cache }) {
         }
         
         const createAnnotationRes = posthog.api.post('/api/annotation/', { host: global.posthogHost, data: tagData })
-
+        console.log(`added annotation: ${tag.name}`)
         if (createAnnotationRes.status === 201) {
             posthog.capture('created_tag_annotation', { tag: tag.name })
         }
