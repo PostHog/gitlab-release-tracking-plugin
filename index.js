@@ -64,7 +64,7 @@ async function runEveryMinute({ config, global, cache }) {
             date_marker: tag.date,
         }
         
-        const createAnnotationRes = posthog.api.post('/api/annotation/', { host: global.posthogHost, data: tagData })
+        const createAnnotationRes = await posthog.api.post('/api/annotation/', { host: global.posthogHost, data: tagData })
         console.log(createAnnotationRes)
         if (createAnnotationRes.status === 201) {
             console.log(`added annotation: ${tag.name}`)
