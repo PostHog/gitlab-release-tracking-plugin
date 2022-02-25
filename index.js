@@ -30,11 +30,13 @@ async function setupPlugin({ config, global }) {
 }
 
 
-async function runEveryMinute({ config, global, cache }) {
+async function runEveryHour({ config, global, cache }) {
     let allPostHogAnnotations = []
-    let next = true          
+    
+    let next = true
+
     while (next) {
-        const annotationsResponse = await posthog.api.get(next === true ? '/api/annotation/?scope=organization&deleted=false' : next, {
+        const annotationsResponse = await posthog.api.get(next === true ? '/api/annotation/?scope=project' : next, {
             host: global.posthogHost
         })
         const annotationsJson = await annotationsResponse.json()
@@ -60,14 +62,13 @@ async function runEveryMinute({ config, global, cache }) {
     for (let tag of newTags) {
         const tagData = {
             content: tag.name,
-            scope: 'organization',
+            scope: 'project',
             date_marker: tag.date,
         }
         
         const createAnnotationRes = await posthog.api.post('/api/annotation/', { host: global.posthogHost, data: tagData })
         if (createAnnotationRes.status === 201) {
             console.log(`added annotation: ${tag.name}`)
-            posthog.capture('created_tag_annotation', { tag: tag.name })
         }
     }
 }
