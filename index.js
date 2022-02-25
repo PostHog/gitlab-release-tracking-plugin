@@ -36,7 +36,7 @@ async function runEveryHour({ config, global, cache }) {
     let next = true
 
     while (next) {
-        const annotationsResponse = await posthog.api.get(next === true ? '/api/annotation/?scope=project' : next, {
+        const annotationsResponse = await posthog.api.get(next === true ? '/api/projects/@current/annotations/?scope=project&deleted=false' : next, {
             host: global.posthogHost
         })
         const annotationsJson = await annotationsResponse.json()
@@ -66,7 +66,7 @@ async function runEveryHour({ config, global, cache }) {
             date_marker: tag.date,
         }
         
-        const createAnnotationRes = await posthog.api.post('/api/annotation/', { host: global.posthogHost, data: tagData })
+        const createAnnotationRes = await posthog.api.post('/api/projects/@current/annotations/', { host: global.posthogHost, data: tagData })
         if (createAnnotationRes.status === 201) {
             console.log(`added annotation: ${tag.name}`)
         }
